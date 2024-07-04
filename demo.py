@@ -5,6 +5,10 @@ import time
 import random
 import sys
 
+def my_random():
+    rnd = random.SystemRandom()
+    return rnd.choice([0,1,2,3])
+
 def clear_screen(height=100):
     for i in range(height):
         print('\n')
@@ -44,7 +48,7 @@ def main(width, height):
                 f.write('\n')            
                 f.write('-'*width + '\n')
 
-                offsets[i] += random.randint(0,3)
+                offsets[i] += my_random()
                 if offsets[i] > width - horse_max_width:
                     print('Horse', i+1, 'wins!')
                     winner = i
