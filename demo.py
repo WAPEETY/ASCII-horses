@@ -13,9 +13,55 @@ def clear_screen(height=100):
     for i in range(height):
         print('\n')
 
-def main(width, height):
-    random.seed(time.time())
+def max_horses(height, horse_height):
+    height -= 2
+    return height // (horse_height + 1)
 
+def calculate_horse_height(horse_frames):
+    return max([len(frame) for frame in horse_frames])
+
+def delete_file(path):
+    if os.path.exists(path):
+        with open(path,'r') as f:
+            os.remove(path)
+
+def print_and_remove_frame(frame):
+    if os.path.exists(frame):
+        with open(frame,'r') as f:
+            print(f.read())
+            time.sleep(0.1)
+            os.remove(frame)
+    
+def create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max_width, offsets, t_width):
+    winner = -1
+    with open(frame_file,'a') as f:
+        for i in range(num_horses):
+            for line in horse_frames[iteration % 2 if i % 2 == 0 else (iteration + 1) % 2]:
+                
+                n_horse = i+1
+                if n_horse < 10:
+                    line = line.replace('x', str(n_horse))
+                    line = line.replace('y', ' ')
+                else:
+                    line = line.replace('x', str(n_horse % 10))
+                    line = line.replace('y', str(n_horse // 10))
+                
+                f.write(' '*offsets[i] + line)
+                    
+            f.write('\n')            
+            f.write('-'*t_width + '\n')
+
+            offsets[i] += my_random()
+            if offsets[i] > t_width - horse_max_width:
+                print('Horse', i+1, 'wins!')
+                winner = i
+                offsets[i] = t_width - horse_max_width
+        iteration += 1
+
+    return iteration, winner, offsets
+
+def main(t_width, t_height, num_horses):
+    random.seed(time.time())
     horse_frames = ['','']
     horse_widths = [0,0]
     with open('assets/ascii_horse_1.txt') as f:
@@ -25,48 +71,65 @@ def main(width, height):
         horse_frames[1] = f.readlines()
         horse_widths[1] = max([len(line) for line in horse_frames[1]])
 
+    frame_file = 'frame.txt'
+
     horse_max_width = max(horse_widths)
-    offsets = [0,0,0,0]
+    offsets = [0] * num_horses
 
     winner = -1
     iteration = 0
 
     while winner == -1:
-        clear_screen(height)
+        clear_screen(t_height)
+        print_and_remove_frame(frame_file)   
+        iteration, winner, offsets = create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max_width, offsets, t_width)
 
-        #if the file exists, read it and print it
-        if os.path.exists('frame.txt'):
-            with open('frame.txt','r') as f:
-                print(f.read())
-                time.sleep(0.1)
-                os.remove('frame.txt')
-                
-        with open('frame.txt','a') as f:
-            for i in range(4):
-                for line in horse_frames[iteration % 2 if i % 2 == 0 else (iteration + 1) % 2]:
-                    f.write(' '*offsets[i] + line)
-                f.write('\n')            
-                f.write('-'*width + '\n')
+    delete_file(frame_file)
 
-                offsets[i] += my_random()
-                if offsets[i] > width - horse_max_width:
-                    print('Horse', i+1, 'wins!')
-                    winner = i
-                    offsets[i] = width - horse_max_width
-            iteration += 1
+def print_help():
+    print('Usage: python3 demo.py [OPTIONS]')
+    print('Options:')
+    print('  --help: Display this help message.')
+    print('  --version: Display the version of the program.')
+    print('  --number [NUMBER]: Set the number of horses in the race, IMPORTANT: this does not guarantee that all horses will be displayed.')
 
-    if winner != -1 and os.path.exists('frame.txt'):
-        with open('frame.txt','r') as f:
-            os.remove('frame.txt')
-                
-            
+def print_version():
+    print('Version 1.2.0')
+
 if __name__ == '__main__':
-    print('Press Ctrl-C to quit.')
-    width = os.get_terminal_size().columns
-    print('Terminal width:', width)
+
+    #find --choice, --file
+    if '--help' in sys.argv:
+        print_help()
+        sys.exit(0)
+
+    if '--version' in sys.argv:
+        print_version()
+        sys.exit(0)
+
+    if '--number' in sys.argv:
+        try:
+            num_horses = int(sys.argv[sys.argv.index('--number') + 1])
+            if num_horses < 1 or num_horses > 99:
+                raise ValueError
+        except:
+            print('Invalid number of horses.')
+            sys.exit(1)
+    else:
+        num_horses = 4
+
+    if '--file' in sys.argv:
+        print('File option not implemented yet.')
     
+    if '--choice' in sys.argv:
+        print('Choice option not implemented yet.')
+
+    width = os.get_terminal_size().columns
     height = os.get_terminal_size().lines
+
+    print('Press Ctrl-C to quit.')
+    print('Terminal width:', width)
     print('Terminal height:', height)
 
     time.sleep(2)
-    main(width, height)
+    main(width, height, num_horses)
