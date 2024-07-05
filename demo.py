@@ -4,6 +4,7 @@ import os
 import time
 import random
 import sys
+import re
 
 def my_random():
     rnd = random.SystemRandom()
@@ -31,7 +32,7 @@ def print_and_remove_frame(frame):
             print(f.read())
             time.sleep(0.1)
             os.remove(frame)
-    
+
 def create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max_width, offsets, t_width):
     winner = -1
     with open(frame_file,'a') as f:
@@ -60,7 +61,7 @@ def create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max
 
     return iteration, winner, offsets
 
-def main(t_width, t_height, num_horses):
+def main(t_width, t_height, num_horses, frame_file):
     random.seed(time.time())
     horse_frames = ['','']
     horse_widths = [0,0]
@@ -70,8 +71,6 @@ def main(t_width, t_height, num_horses):
     with open('assets/ascii_horse_2.txt') as f:
         horse_frames[1] = f.readlines()
         horse_widths[1] = max([len(line) for line in horse_frames[1]])
-
-    frame_file = 'frame.txt'
 
     horse_max_width = max(horse_widths)
     offsets = [0] * num_horses
@@ -98,7 +97,10 @@ def print_version():
 
 if __name__ == '__main__':
 
-    #find --choice, --file
+    if os.geteuid() == 0:
+        print('Do not run this program as root !!!')
+        sys.exit(1)
+
     if '--help' in sys.argv:
         print_help()
         sys.exit(0)
@@ -119,10 +121,19 @@ if __name__ == '__main__':
         num_horses = 4
 
     if '--file' in sys.argv:
-        print('File option not implemented yet.')
-    
-    if '--choice' in sys.argv:
-        print('Choice option not implemented yet.')
+        try:
+            path = sys.argv[sys.argv.index('--file') + 1]
+            regex = re.compile(r'^[a-zA-Z0-9_./]+$')
+
+            if not regex.match(path):
+                raise ValueError
+            if os.path.exists(path):
+                raise FileExistsError
+        except:
+            print('Invalid file path.')
+            sys.exit(1)
+    else:
+        path = 'frame.txt'
 
     width = os.get_terminal_size().columns
     height = os.get_terminal_size().lines
@@ -132,4 +143,4 @@ if __name__ == '__main__':
     print('Terminal height:', height)
 
     time.sleep(2)
-    main(width, height, num_horses)
+    main(width, height, num_horses, path)
