@@ -35,12 +35,17 @@ def print_and_remove_frame(frame):
 
 def generate_race(num_horses, horse_max_width, offsets, t_width, my_random_values):
 
+    winner = -1
+
     for i in range(num_horses):
         my_random_values.append(my_random())
         offsets[i] += my_random_values[-1]
         if offsets[i] > t_width - horse_max_width:
             offsets[i] = t_width - horse_max_width
-            return my_random_values 
+            winner = 1
+
+    if winner == 1:
+        return my_random_values
 
     return generate_race(num_horses, horse_max_width, offsets, t_width, my_random_values)
 
@@ -69,8 +74,6 @@ def create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max
                 print('Horse', i+1, 'wins!')
                 winner = i
                 offsets[i] = t_width - horse_max_width
-                return iteration, winner, offsets
-
                 
         iteration += 1
 
