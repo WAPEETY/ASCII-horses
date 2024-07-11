@@ -2,13 +2,13 @@
 
 import os
 import time
-import random
+import secrets
 import sys
 import re
+import hashlib
 
 def my_random():
-    rnd = random.SystemRandom()
-    return rnd.choice([0,1,2,3])
+    return secrets.randbelow(4) # Non vorrai mica che Gaspare preveda chi vince!
 
 def clear_screen(height=100):
     for i in range(height):
@@ -33,7 +33,18 @@ def print_and_remove_frame(frame):
             time.sleep(0.1)
             os.remove(frame)
 
-def create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max_width, offsets, t_width):
+def generate_race(num_horses, horse_max_width, offsets, t_width, my_random_values):
+
+    for i in range(num_horses):
+        my_random_values.append(my_random())
+        offsets[i] += my_random_values[-1]
+        if offsets[i] > t_width - horse_max_width:
+            offsets[i] = t_width - horse_max_width
+            return my_random_values 
+
+    return generate_race(num_horses, horse_max_width, offsets, t_width, my_random_values)
+
+def create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max_width, offsets, t_width, my_random_values):
     winner = -1
     with open(frame_file,'a') as f:
         for i in range(num_horses):
@@ -52,17 +63,20 @@ def create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max
             f.write('\n')            
             f.write('-'*t_width + '\n')
 
-            offsets[i] += my_random()
+            offsets[i] += my_random_values.pop(0)
+
             if offsets[i] > t_width - horse_max_width:
                 print('Horse', i+1, 'wins!')
                 winner = i
                 offsets[i] = t_width - horse_max_width
+                return iteration, winner, offsets
+
+                
         iteration += 1
 
     return iteration, winner, offsets
 
 def main(t_width, t_height, num_horses, frame_file):
-    random.seed(time.time())
     horse_frames = ['','']
     horse_widths = [0,0]
     with open('assets/ascii_horse_1.txt') as f:
@@ -78,10 +92,25 @@ def main(t_width, t_height, num_horses, frame_file):
     winner = -1
     iteration = 0
 
+    my_random_values = []
+    my_random_values = generate_race(num_horses, horse_max_width, offsets, t_width, my_random_values)
+
+    secret = secrets.randbelow(100_000_000 - 10_000_000) + 10_000_000
+
+    my_random_values_str = ''.join(str(random_value) for random_value in my_random_values)
+
+    print(f"sha256 value: {hashlib.sha256((str(secret)+my_random_values_str).encode()).hexdigest()}")
+
+    offsets = [0] * num_horses
+    input("Waiting for bets. . .")
+    
     while winner == -1:
         clear_screen(t_height)
         print_and_remove_frame(frame_file)   
-        iteration, winner, offsets = create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max_width, offsets, t_width)
+        iteration, winner, offsets = create_frame_file(frame_file, iteration, num_horses, horse_frames, horse_max_width, offsets, t_width, my_random_values)
+
+    print(f"secret: {secret}")
+    print(f"random values: {my_random_values_str}")
 
     delete_file(frame_file)
 
