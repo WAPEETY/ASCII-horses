@@ -65,10 +65,10 @@ def main(t_width, t_height, num_horses, frame_file):
     random.seed(time.time())
     horse_frames = ['','']
     horse_widths = [0,0]
-    with open('assets/ascii_horse_1.txt') as f:
+    with open('assets/horses/ascii_horse_1.txt') as f:
         horse_frames[0] = f.readlines()
         horse_widths[0] = max([len(line) for line in horse_frames[0]])
-    with open('assets/ascii_horse_2.txt') as f:
+    with open('assets/horses/ascii_horse_2.txt') as f:
         horse_frames[1] = f.readlines()
         horse_widths[1] = max([len(line) for line in horse_frames[1]])
 
