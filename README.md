@@ -3,8 +3,7 @@ ASCII horses is a simple python script that generates random virtual horses race
 
 ## Usage
 ```bash
-chmod +x ascii_horses.py
-./ascii_horses.py
+socat TCP-LISTEN:1337,reuseaddr,fork EXEC:python3\ main.py,pty,stderr,setsid,sigint,sane
 ```
 
 ## Notice

@@ -33,27 +33,27 @@ def main_menu(parent_win):
     options = [
         {
             'id': 'quick_match',
-            'text': 'Quick Match'
+            'text': '0. Quick Match'
         },
-        {
-            'id': 'start',
-            'text': 'Start'
-        },
+        #{
+        #    'id': 'start',
+        #    'text': '1. Start'
+        #},
         {
             'id': 'display_horse',
-            'text': 'Display a horse'
+            'text': '1. Display a horse'
         },
-        {
-            'id': 'help',
-            'text': 'Help'
-        },
-        {
-            'id':'settings',
-            'text': 'Settings'
-        },
+        #{
+        #    'id': 'help',
+        #    'text': '2. Help'
+        #},
+        #{
+        #    'id':'settings',
+        #    'text': '5. Settings'
+        #},
         {
             'id': 'exit',
-            'text': 'Exit'
+            'text': '2. Exit'
         }
     ]
     current_option = 0
@@ -62,28 +62,33 @@ def main_menu(parent_win):
     menu_win.move(1, 2)
     menu_win.keypad(True)
 
-    while True:
-        menu_win.clear()
-        menu_win.refresh()
+    #while True:
+    menu_win.clear()
+    menu_win.refresh()
 
-        if key == curses.KEY_DOWN:
-            current_option = (current_option + 1) % len(options)
-        elif key == curses.KEY_UP:
-            current_option = (current_option - 1) % len(options)
-        elif key == curses.KEY_ENTER or key in [10, 13]:
-            menu_win.clear()
-            menu_win.refresh()
-            return options[current_option]['id']
+        #if key == curses.KEY_DOWN or key == ord('d'):
+        #    current_option = (current_option + 1) % len(options)
+        #elif key == curses.KEY_UP or key == ord('u'):
+        #    current_option = (current_option - 1) % len(options)
+        #elif key == curses.KEY_ENTER or key in [10, 13]:
+        #    menu_win.clear()
+        #    menu_win.refresh()
+        #    return options[current_option]['id']
 
-        for i, option in enumerate(options):
-            if i == current_option:
-                menu_win.attron(curses.color_pair(1))
-                menu_win.addstr(i+2, 2, '-> ' + option['text'])
-                menu_win.attroff(curses.color_pair(1))
-            else:
-                menu_win.addstr(i+2, 2, option['text'])
-        menu_win.refresh()
-        key = menu_win.getch()
+    for i, option in enumerate(options):
+        menu_win.addstr(i+2, 2, option['text'])
+    menu_win.refresh()
+    key = menu_win.getch()
+
+    if key >= 48 and key <= 57:
+        key = key - 48
+    else:
+        key = 0
+
+    if key < 0 or key >= len(options):
+        key = 0
+    
+    return options[key]['id']
 
 def main_handler(stdscr):
     setup_screen(stdscr)

@@ -133,12 +133,12 @@ def print_ranking(parent_win, ranking, bet):
             win.addstr(i, 2,  str(i+1) + '. Horse ' + str(r+1))
 
     win.attron(curses.color_pair(1))
-    win.addstr(i+2, 2, "<- Press backspace to continue")
+    win.addstr(i+2, 2, "<- Press enter to continue")
     win.attroff(curses.color_pair(1))
     win.refresh()
 
     key = 0
-    while key != 127:
+    while key != 127 and key != 10 and key != 13:
         key = win.getch()
 
     win.clear()
