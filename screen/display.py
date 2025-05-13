@@ -1,6 +1,6 @@
 import curses
 import os
-import random
+import myrandom
 import time
 import horse
 

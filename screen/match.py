@@ -1,12 +1,8 @@
 import curses
 import os
 import horse
-import random
 import time
-
-def random_num(min, max):
-    rnd = random.SystemRandom()
-    return rnd.choice(range(min, max))
+import myrandom
 
 def play(parent_win, horses, bet, cheats):
     sh, sw = parent_win.getmaxyx()
@@ -35,7 +31,6 @@ def play(parent_win, horses, bet, cheats):
         horses = horse.max_horses(sh - 2, horse_height)
 
     if bet == 0:
-        #bet = random_num(1, horses)
         bet = -1
 
     win.addstr(2, 2, 'Starting match with ' + str(horses) + ' horses')
@@ -67,7 +62,7 @@ def play(parent_win, horses, bet, cheats):
                 horse.print_horse_in_game(horse_win[i],i,round,horse_height,horse_frames,offset[i], (key == 32 and bet-1==i))
                 print_arrival(win,sw,sh)
 
-                offset[i] = offset[i] + random_num(0,3)
+                offset[i] = offset[i] + myrandom.use(0,3)
 
                 if(key == 107 and cheats):
                     
@@ -78,7 +73,7 @@ def play(parent_win, horses, bet, cheats):
                     for k in killed_horses:
                         alive_and_running.remove(k)
 
-                    kill = random.choice(alive_and_running)
+                    kill = myrandom.choice(alive_and_running)
                     
                     killed_horses.append(kill)
                     horse.print_killed_horse(horse_win[kill],kill,round,dead_horse_height,killed_horse_frames,offset[kill])
@@ -87,7 +82,7 @@ def play(parent_win, horses, bet, cheats):
                     continue
 
                 if(key == 32 and bet-1 == i and i not in killed_horses):
-                    offset[i] = offset[i] + random_num(0,1)
+                    offset[i] = offset[i] + myrandom.use(0,1)
             
                 if(offset[i] >= sw-4 - horse_width):
                 
