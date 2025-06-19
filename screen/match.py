@@ -3,6 +3,7 @@ import os
 import horse
 import time
 import myrandom
+import math
 
 def play(parent_win, horses, bet, cheats):
     sh, sw = parent_win.getmaxyx()
@@ -109,35 +110,76 @@ def print_arrival(win, sw,sh):
             win.addstr(i, sw-4, '█')
     win.refresh()
 
-def print_ranking(parent_win, ranking, bet):
+def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
     parent_win.clear()
     parent_win.refresh()
 
     sh, sw = parent_win.getmaxyx()
-    rows = len(ranking)
 
-    win = curses.newwin(rows + 3, 40, sh//2 - rows//2 + 1, sw//2 - 20)
-    i = 0
+    board_top_coord = 3
+    board_size = sh - board_top_coord*2 # rows in a scoreboard
+    n_boards = math.ceil(len(ranking) / board_size)
 
-    for i, r in enumerate(ranking):
-        if r+1 == bet:
-            win.attron(curses.color_pair(1))
-            win.addstr(i, 2,  str(i+1) + '. Horse ' + str(r+1) + ' <- Bet')
-            win.attroff(curses.color_pair(1))
-        else:
-            win.addstr(i, 2,  str(i+1) + '. Horse ' + str(r+1))
+    board_widths: list[int] = [] # to space the boards neatly we need to know where to start horizontally, and for that we need to know how wide they all are
+    for board_idx in range(n_boards):
+        # we want to make the scoreboard as narrow as possible to fit as many scoreboards as we can on the screen,
+        # so we have to know the longest text we'll write on it; this depends on the horse rankings, if the horse we bet on is in this board,
+        # and if it's the last board (press backspace to blablabla)
 
-    win.attron(curses.color_pair(1))
-    win.addstr(i+2, 2, "<- Press backspace to continue")
-    win.attroff(curses.color_pair(1))
-    win.refresh()
+        ranks = ranking[board_size * board_idx : board_size * (board_idx + 1)]
+        max_horse = board_size * board_idx + ranks.index(max(ranks)) # index of ranking[] for the horse with the highest rank in this board
+        is_last = board_idx == n_boards - 1
 
-    key = 0
-    while key != 127:
-        key = win.getch()
+        try:
+            bet_idx = board_size * board_idx + ranks.index(bet - 1) # the rankings are 0-relative and the bet is 1-relative. like max_horse, this is an index for ranking[]
+        except:
+            bet_idx = -1
+        
+        max_horse_width = len(f"{ranking[max_horse] + 1}. Horse {max_horse + 1}")
+        bet_width = 0 if bet_idx == -1 else len(f"{bet_idx + 1}. Horse {bet} <- Bet")
+        last_width = 0 if not is_last else len("<- Press backspace to continue")
+        board_width = max(max_horse_width, bet_width, last_width) + 5
+        board_widths.append(board_width)
+    
+    """
+    initially the x coordinate of the first board, then slides to the right each time
+    with too many horses this might become negative, so we just set a minimum value, and that means that we won't be able to show all of the scoreboards
+    """
+    current_x_coord = max((sw - sum(board_widths)) // 2, 5)
+    windows: list[curses.window] = []
 
-    win.clear()
-    win.refresh()
+    # create all of the windows from left to right
+    for board_idx in range(n_boards):
+        window = curses.newwin(board_size, board_widths[board_idx], board_top_coord, current_x_coord)
+        current_x_coord += board_widths[board_idx]
+        windows.append(window)
+    
+    rank_len = len(str(len(ranking)))
+    for i, rank in enumerate(ranking):
+        window = windows[i // board_size]
+        row = i % board_size
+
+        text = str(i + 1).rjust(rank_len) + f". Horse {rank + 1}"
+        if rank + 1 == bet:
+            window.attron(curses.color_pair(1))
+            text += " <- Bet"
+        
+        window.addstr(row, 0, text)
+        window.attroff(curses.color_pair(1))
+    
+    windows[-1].attron(curses.color_pair(1))
+    windows[-1].addstr(len(ranking) % board_size, 0, "<- Press backspace to continue")
+    windows[-1].attroff(curses.color_pair(1))
+    
+    for window in windows:
+        window.refresh()
+    
+    while parent_win.getch() != 127: # wait for backspace
+        pass
+
+    for window in windows:
+        window.clear()
+        window.refresh()
 
 def quick(win):
     play(win, 0, 0, False)
