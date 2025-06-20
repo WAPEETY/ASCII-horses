@@ -15,7 +15,7 @@ def generate_boost(s):
 
 def print_horse_in_game(win,i,round,hh,horse_frames,offset,boosted):
     sh, sw = win.getmaxyx()
-    win.clear()
+    win.erase()
     
     for j in range(hh):
         
