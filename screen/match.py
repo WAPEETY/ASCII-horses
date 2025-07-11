@@ -137,7 +137,7 @@ def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
         
         max_horse_width = len(f"{ranking[max_horse] + 1}. Horse {max_horse + 1}")
         bet_width = 0 if bet_idx == -1 else len(f"{bet_idx + 1}. Horse {bet} <- Bet")
-        last_width = 0 if not is_last else len("<- Press backspace to continue")
+        last_width = 0 if not is_last else len("<- Press backspace or h to continue")
         board_width = max(max_horse_width, bet_width, last_width) + 5
         board_widths.append(board_width)
     
@@ -168,14 +168,17 @@ def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
         window.attroff(curses.color_pair(1))
     
     windows[-1].attron(curses.color_pair(1))
-    windows[-1].addstr(len(ranking) % board_size, 0, "<- Press backspace to continue")
+    windows[-1].addstr(len(ranking) % board_size, 0, "<- Press backspace or h to continue")
     windows[-1].attroff(curses.color_pair(1))
     
     for window in windows:
         window.refresh()
     
-    while parent_win.getch() != 127: # wait for backspace
-        pass
+    # wait for backspace or 'h'
+    while True: # why no do while in python :(
+        key = parent_win.getch()
+        if key == 127 or key == ord('h'):
+            break
 
     for window in windows:
         window.clear()

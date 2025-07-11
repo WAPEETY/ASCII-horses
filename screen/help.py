@@ -22,7 +22,7 @@ def help(parent_win):
     win.attroff(curses.color_pair(1))
     
     key = 0
-    while key != 127:
+    while key != 127 and key != ord('h'):
         key = win.getch()
     
     win.clear()

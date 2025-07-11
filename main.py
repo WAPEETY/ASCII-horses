@@ -66,13 +66,13 @@ def main_menu(parent_win):
         menu_win.clear()
         menu_win.refresh()
 
-        if key == curses.KEY_DOWN:
+        if key == curses.KEY_DOWN or key == ord('j'):
             current_option = (current_option + 1) % len(options)
-        elif key == curses.KEY_UP:
+        elif key == curses.KEY_UP or key == ord('k'):
             current_option = (current_option - 1) % len(options)
-        elif key == curses.KEY_ENTER or key in [10, 13]:
-            menu_win.clear()
-            menu_win.refresh()
+        elif key == curses.KEY_ENTER or key in [10, 13] or key == ord('l'):
+            win.clear()
+            win.refresh()
             return options[current_option]['id']
 
         for i, option in enumerate(options):
