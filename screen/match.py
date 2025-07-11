@@ -35,7 +35,10 @@ def play(parent_win, horses, bet, cheats):
         bet = -1
 
     win.addstr(2, 2, 'Starting match with ' + str(horses) + ' horses')
-    win.addstr(3, 2, 'Bet has been placed on horse ' + str(bet))
+    if bet == -1:
+        win.addstr(3, 2, "No bet placed, but that doesn't mean you can change your mind during the race :)")
+    else:
+        win.addstr(3, 2, 'Bet has been placed on horse ' + str(bet))
     win.refresh()
     time.sleep(2)
 
