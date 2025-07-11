@@ -90,13 +90,13 @@ def main_menu(parent_win):
 def main_handler(stdscr):
     setup_screen(stdscr)
     sh, sw = stdscr.getmaxyx()
-
     win = curses.newwin(sh, sw, 0, 0)
-    win.box()
-    win.addstr(0, 2, ' Better ASCII horses ')
-    win.refresh()
 
     while True:
+        win.box()
+        win.addstr(0, 2, ' Better ASCII horses ')
+        win.refresh()
+
         res = main_menu(win)
 
         if res == 'exit':
