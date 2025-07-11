@@ -35,7 +35,10 @@ def play(parent_win, horses, bet, cheats):
         bet = -1
 
     win.addstr(2, 2, 'Starting match with ' + str(horses) + ' horses')
-    win.addstr(3, 2, 'Bet has been placed on horse ' + str(bet))
+    if bet == -1:
+        win.addstr(3, 2, "No bet placed, but that doesn't mean you can change your mind during the race :)")
+    else:
+        win.addstr(3, 2, 'Bet has been placed on horse ' + str(bet))
     win.refresh()
     time.sleep(2)
 
@@ -115,6 +118,10 @@ def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
     parent_win.refresh()
 
     sh, sw = parent_win.getmaxyx()
+    win = curses.newwin(sh, sw, 0, 0)
+    win.box()
+    win.addstr(0, 2, ' Match Results ')
+    win.refresh()
 
     board_top_coord = 3
     board_size = sh - board_top_coord*2 # rows in a scoreboard
