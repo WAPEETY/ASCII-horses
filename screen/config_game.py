@@ -13,11 +13,14 @@ def config_step(parent_win):
 
     curses.echo()
     win.keypad(True)
+    curses.curs_set(1)
 
     win.move(2, 20)
     horses = int(win.getstr().decode())
     win.move(3, 14)
     bet = int(win.getstr().decode())
+
+    curses.curs_set(0)
     win.keypad(False)
     curses.noecho()
 
