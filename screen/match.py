@@ -115,6 +115,10 @@ def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
     parent_win.refresh()
 
     sh, sw = parent_win.getmaxyx()
+    win = curses.newwin(sh, sw, 0, 0)
+    win.box()
+    win.addstr(0, 2, ' Match Results ')
+    win.refresh()
 
     board_top_coord = 3
     board_size = sh - board_top_coord*2 # rows in a scoreboard
