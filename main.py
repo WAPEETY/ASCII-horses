@@ -70,6 +70,8 @@ def main_menu(parent_win):
             current_option = (current_option + 1) % len(options)
         elif key == curses.KEY_UP or key == ord('k'):
             current_option = (current_option - 1) % len(options)
+        elif key == ord('q'):
+            return 'exit'
         elif key == curses.KEY_ENTER or key in [10, 13] or key == ord('l'):
             win.clear()
             win.refresh()
