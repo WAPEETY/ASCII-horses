@@ -33,8 +33,8 @@ def display(parent_win):
     while True:
         for frame in frames:
             #start printing the frame in random places but not outside the screen
-            y = random.randint(0, sh - max_height -1)
-            x = random.randint(0, sw - max_width -1)
+            y = myrandom.randint(0, sh - max_height -1)
+            x = myrandom.randint(0, sw - max_width -1)
 
             #remove newlines from the frame
             frame = [line[:-1] for line in frame]
