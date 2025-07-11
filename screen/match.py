@@ -5,6 +5,8 @@ import time
 import myrandom
 import math
 
+import mymovements
+
 def play(parent_win, horses, bet, cheats):
     sh, sw = parent_win.getmaxyx()
     win = curses.newwin(sh, sw, 0, 0)
@@ -144,7 +146,7 @@ def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
         
         max_horse_width = len(f"{ranking[max_horse] + 1}. Horse {max_horse + 1}")
         bet_width = 0 if bet_idx == -1 else len(f"{bet_idx + 1}. Horse {bet} <- Bet")
-        last_width = 0 if not is_last else len("<- Press backspace or h to continue")
+        last_width = 0 if not is_last else len(mymovements.GO_BACK_DIALOG)
         board_width = max(max_horse_width, bet_width, last_width) + 5
         board_widths.append(board_width)
     
@@ -175,16 +177,16 @@ def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
         window.attroff(curses.color_pair(1))
     
     windows[-1].attron(curses.color_pair(1))
-    windows[-1].addstr(len(ranking) % board_size, 0, "<- Press backspace or h to continue")
+    windows[-1].addstr(len(ranking) % board_size, 0, mymovements.GO_BACK_DIALOG)
     windows[-1].attroff(curses.color_pair(1))
     
     for window in windows:
         window.refresh()
     
-    # wait for backspace or 'h'
+    # wait for key to go back
     while True: # why no do while in python :(
         key = parent_win.getch()
-        if key == 127 or key == ord('h'):
+        if mymovements.check_go_back(key):
             break
 
     for window in windows:
