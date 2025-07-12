@@ -2,13 +2,15 @@
 
 import curses
 from curses import textpad, wrapper
-import time
 
 from screen import help
 from screen import match
 from screen import settings
 from screen import display
 from screen import config_game
+from screen import exit
+
+import mymovements
 
 def setup_screen(stdscr):
     stdscr.clear()
@@ -26,10 +28,6 @@ def setup_screen(stdscr):
 def main_menu(parent_win):
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-    sh, sw = parent_win.getmaxyx()
-    menu_win = curses.newwin(12, 40, sh//2 - 6, sw//2 - 20)
-
-    key = 0
     options = [
         {
             'id': 'quick_match',
@@ -56,34 +54,8 @@ def main_menu(parent_win):
             'text': 'Exit'
         }
     ]
-    current_option = 0
 
-    menu_win.refresh()
-    menu_win.move(1, 2)
-    menu_win.keypad(True)
-
-    while True:
-        menu_win.clear()
-        menu_win.refresh()
-
-        if key == curses.KEY_DOWN:
-            current_option = (current_option + 1) % len(options)
-        elif key == curses.KEY_UP:
-            current_option = (current_option - 1) % len(options)
-        elif key == curses.KEY_ENTER or key in [10, 13]:
-            menu_win.clear()
-            menu_win.refresh()
-            return options[current_option]['id']
-
-        for i, option in enumerate(options):
-            if i == current_option:
-                menu_win.attron(curses.color_pair(1))
-                menu_win.addstr(i+2, 2, '-> ' + option['text'])
-                menu_win.attroff(curses.color_pair(1))
-            else:
-                menu_win.addstr(i+2, 2, option['text'])
-        menu_win.refresh()
-        key = menu_win.getch()
+    return mymovements.menu_loop(parent_win, options, is_main_menu=True)
 
 def main_handler(stdscr):
     setup_screen(stdscr)
@@ -97,11 +69,8 @@ def main_handler(stdscr):
 
         res = main_menu(win)
 
-        if res == 'exit':
-            win.addstr(2, 2, 'Goodbye!')
-            win.refresh()
-            time.sleep(2)
-            return 0
+        if res == 'exit' or res is None:
+            exit.exit(stdscr)
         elif res == 'quick_match':
             match.quick(win)
         elif res == 'start':

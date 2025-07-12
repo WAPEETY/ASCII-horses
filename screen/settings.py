@@ -1,6 +1,8 @@
 import curses
 import os
 
+import mymovements
+
 def enable_cheats():
     with open('.cheats', 'w') as f:
         f.write('')
@@ -19,7 +21,7 @@ def settings(parent_win):
     while True:
         res = settings_menu(win)
 
-        if res == 'back':
+        if res == 'back' or res is None:
             break
         elif res == 'enable_cheats':
             enable_cheats()
@@ -31,10 +33,6 @@ def settings(parent_win):
 def settings_menu(parent_win):
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
 
-    sh, sw = parent_win.getmaxyx()
-    win = curses.newwin(5, 40, sh//2 - 2, sw//2 - 20)
-
-    key = 0
     options = [
         {
             'id': 'back',
@@ -53,30 +51,4 @@ def settings_menu(parent_win):
             'text': 'Enable cheats'
         })
 
-    current_option = 0
-
-    win.keypad(True)
-    win.refresh()
-
-    while True:
-        win.clear()
-        win.refresh()
-
-        if key == curses.KEY_DOWN:
-            current_option = (current_option + 1) % len(options)
-        elif key == curses.KEY_UP:
-            current_option = (current_option - 1) % len(options)
-        elif key == curses.KEY_ENTER or key in [10, 13]:
-            win.clear()
-            win.refresh()
-            return options[current_option]['id']
-
-        for i, option in enumerate(options):
-            if i == current_option:
-                win.attron(curses.color_pair(1))
-                win.addstr(i+1, 2, '-> ' + option['text'])
-                win.attroff(curses.color_pair(1))
-            else:
-                win.addstr(i+1, 2, option['text'])
-        win.refresh()
-        key = win.getch()
+    return mymovements.menu_loop(parent_win, options)

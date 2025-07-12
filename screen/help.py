@@ -1,5 +1,7 @@
 import curses
 
+import mymovements
+
 def help(parent_win):
     sh, sw = parent_win.getmaxyx()
     win = curses.newwin(sh//2 - 4, sw//2 - 4, sh//2 - sh//4 + 2, sw//2 - sw//4 + 2)
@@ -21,9 +23,10 @@ def help(parent_win):
     win.addstr(sh//2 - sh//4 ,0,"<- Back")
     win.attroff(curses.color_pair(1))
     
-    key = 0
-    while key != 127:
+    while True:
         key = win.getch()
+        if mymovements.check_go_back(key):
+            break
     
     win.clear()
     win.refresh()
