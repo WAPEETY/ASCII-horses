@@ -52,6 +52,3 @@ def settings_menu(parent_win):
         })
 
     return mymovements.menu_loop(parent_win, options)
-
-        win.refresh()
-        key = win.getch()
