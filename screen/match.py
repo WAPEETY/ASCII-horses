@@ -173,7 +173,9 @@ def print_ranking(parent_win: curses.window, ranking: list[int], bet: int):
         
         window.addstr(row, 0, text)
         window.attroff(curses.color_pair(1))
-    
+    if len(windows) == 0:
+        window = curses.newwin(board_size, sw//2, board_top_coord, current_x_coord)
+        windows.append(window)
     windows[-1].attron(curses.color_pair(1))
     windows[-1].addstr(len(ranking) % board_size, 0, "<- Press backspace to continue")
     windows[-1].attroff(curses.color_pair(1))
